@@ -1,7 +1,8 @@
 <img src="img/logo.png" />
-# OpenDCb
+
+# Open DC brake
 The most important element of baitcasting reel is the brake technology. This dominates the whole performance of baitcasting reel, that is "Long distance without Backlash".
-Digital control technology may be the most sophisticated solution for this problem. Shimano succeeded to realize it as [Digital Control Braking technology(DC brake)](https://www.youtube.com/watch?v=iy6fYpK1zhY) in 2003, but no other manufacture has provided it yet. The drawback of DC brake is it is completeley "untouchable" device, so no one can explore or modify it.
+Digital control technology may be the most sophisticated solution for this problem. Shimano succeeded to realize it as [Digital Control Braking technology/DC brake](https://www.youtube.com/watch?v=iy6fYpK1zhY) in 2003, but no other manufacture has provided it yet. The drawback of DC brake is it is completely "untouchable" device, so no one can know about the inside of it.
 OpenDCb(rake) intends to open this technology as "Digital Casting brake", and help those who want to take this technolgy in their hands.
 
 ## The Goals
@@ -19,12 +20,12 @@ The principal parts are a coil and a magnet rotor. We reveal the design rule for
 Due to the usage of casting reel, the wireless communication is needed for testing.
 
 ## Firmware
-Whole source code for Digital Casting brake technology are revealed under the "arduino/dcuino2" directory. It needs an "Additional Boards Manager" and "Additional Libralies". The followng URL is helpful for the installation.
+Whole source code for Digital Casting brake technology are revealed under the ["arduino/dcuino2"](arduino/) directory. It needs an "Additional Boards Manager" and "Additional Libralies". The followng URL is helpful for the installation.
 
 [Getting Started with Seeed Studio XIAO nRF52840 (Sense)](https://wiki.seeedstudio.com/XIAO_BLE/)
 
-#### Additional Libralies and patches
-Following additinal libraries are needed under "arduino/libraries" directory.
+### Additional Libralies and patches
+Following additinal libraries are needed under ["arduino/libraries"](arduino/libraries) directory.
 1. ArduinoBLE
 2. FS_Nano33BLE
 3. NRF52_MBED_TimerInterrupt
@@ -43,10 +44,10 @@ At line #149-
   #endif
 ~~~ 
 
-#### Specification
+### Specification
 1. Full automatic brake adjustment with tension control
 2. PWM switching sound
-3. Comfortable with sensorless circuit
+3. Comforming with sensorless circuit
 4. Communication via BLE
 
 ## Circuit diagram
