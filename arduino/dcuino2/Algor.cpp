@@ -7,8 +7,8 @@
 
 //params
 uint8_t algor_param[]={
-  130,200,0,0,  20,100,0,0,
-  15,5,20,200,  0,0,0,0,
+  130,100,100,0,  20,50,0,0,
+  15,5,20,100,  0,0,0,0,
   20,17,40,30,  40,0,0,0,
   0,155,13,159, 27,145,45,101,
   79,69,128,39, 189,23,255,19,
@@ -19,7 +19,7 @@ uint8_t algor_param[]={
 //elapsed time
 static uint32_t tusec;
 //observer vars
-static float wmax,wh,bh,dbh;
+static float wmax,wh,bh,hcoef1,hcoef2;
 //profile
 static uint8_t iflag;
 //sigma
@@ -77,34 +77,23 @@ static int readProf(int prof_tbl,int prof_tmsec,uint8_t &idx){
   idx=tbl_index;
   return hval;
 }
-static int readPval(int prof_tbl,int prof_idx){
-  auto pval=PRM_ReadData(prof_tbl+(prof_idx<<1)+1);
-  return pval;
-}
-static int readTval(int prof_tbl,int prof_idx){
-  return PRM_ReadData(prof_tbl+(prof_idx<<1))<<4;   //as msec
-}
-static int smean(int twid){
+static int smean(int wid){
   logger::ALOG *dp=logger::data+logger::length()-1;
   long sum=0;
-  int tm0=(dp->stamp>>10)-twid;
-  for(int dn=0;;dp--,dn++){
-    sum+=dp->sigma*dp->interval;
+  for(int dn=0;dn<wid;dp--,dn++){
+    sum+=dp->sigma;
     int tm=dp->stamp>>10;
-    if(tm<stime){
-      sflag=dn;
-      break;
-    }
-    if(tm<tm0 && dn>=sflag){
-      sflag=dn;
-      break;
-    }
+    if(tm<stime) break;
   }
-  return sum/(twid<<9);
+  return sum*2/wid;
 }
 void algor_prepare(){
   tusec=stime=ztime=sflag=iflag=zflag=0;
   scall=NULL;
+  auto rpole=(float)PRM_ReadData(1);
+  auto ipole=(float)PRM_ReadData(2);
+  hcoef1=2*rpole;
+  hcoef2=rpole*rpole+ipole*ipole;
 }
 uint16_t algor_update(int32_t dtu,int32_t otu){
   if(dtu==0) return 0;
@@ -113,13 +102,10 @@ uint16_t algor_update(int32_t dtu,int32_t otu){
   auto wrps=2*M_PI/dt;
   if(tusec==0){
     wmax=wh=wrps;
-    dbh=bh=0;
+    bh=0;
   }
   if(wmax<wrps) wmax=wrps;
   auto tmsec=(tusec+=dtu)/1000;
-  auto pole=(float)PRM_ReadData(1);
-  auto h1=2*pole;
-  auto h2=pole*pole;
   auto u0=(float)otu/dtu;
   auto uat=PRM_ReadData(0)/(8*M_PI); //1/Tau
   uint8_t nloop=dtu/1000;
@@ -128,10 +114,9 @@ uint16_t algor_update(int32_t dtu,int32_t otu){
   float dbdt=0;
   for(int i=0;i<nloop;i++){
     auto werr=wrps-wh;
-    auto db=werr*h2;
-    wh=wh+(werr*h1+bh-wrps*uat*u0)*dtn;
+    auto db=werr*hcoef2;
+    wh=wh+(werr*hcoef1+bh-wrps*uat*u0)*dtn;
     bh=bh+db*dtn;
-    dbh=dbh+PRM_ReadData(2)*(db-dbh)*dtn;
     dbdt+=db;
   }
   dbdt/=nloop;
@@ -141,18 +126,22 @@ uint16_t algor_update(int32_t dtu,int32_t otu){
 //i-Block: base profile
   auto ivalue=readProf((24),tmsec,iflag);
 //s-Block: sliding mode
-  auto sigv=dbdt+PRM_ReadData(5)*(bh-PRM_ReadData100x(4)); //sliding mode
+  auto sigv=dbdt+PRM_ReadData(5)*(bh-PRM_ReadData100x(4));
+  auto sigw=dbdt/wrps+(bh-PRM_ReadData100x(4))/PRM_ReadData(6);
+  if(PRM_ReadData(7)) sigv=sigw;
   if(scall==NULL){
-    if(tmsec>=PRM_ReadData10x(8)){
+    auto ts=10*readTblN((8),wrps/100,2);
+    if(tmsec>=ts){
       stime=tmsec;
+      sflag=PRM_ReadData10x(13)/(dt*1000);
       setTimeout.set(scall=[](){
-        sspec=smean(PRM_ReadData10x(10));
-        if(dcore::RunLevel>=5 && logger::length()<logger::limit()) setTimeout.set(scall,PRM_ReadData10x(9));
+        sspec=smean(sflag);
+        if(dcore::RunLevel>=5 && logger::length()<logger::limit()) setTimeout.set(scall,PRM_ReadData10x(12));
         else sspec=0;
       },0);
     }
   }
-  float sigb=(PRM_ReadData(12)==0? sigv:dbdt+PRM_ReadData(13)*(bh-PRM_ReadData100x(12)))/PRM_ReadData10x(11);
+  auto sigb=sigw*100/PRM_ReadData(14);
   logger::stage.sigma=MIN(255,MAX(0,sigb));
 //logger
   switch(PRM_ReadData(3)){

@@ -29,8 +29,7 @@ namespace pwm{//methods for gate on(turn pwm pulse high)
   static uint16_t Treq; //Turn on time cmd
   static uint16_t Tact; //actual turn on time sum
   static uint16_t Ton; //latch for Tact
-//  static uint16_t Tpwm[]={1000000/1046,1000000/880,1000000/698,1000000/587};//1046Hz=C5
-  static uint16_t Tpwm[]={1000000/1174,1000000/880};//1174Hz=D5,880Hz=A4
+  static uint16_t Tpwm[]={1000000/1397,1000000/1046,1000000/830};//1174Hz=D5,784Hz=G4
   static uint8_t Duty; //duty command
   static bool Block;
   void on(); //to turn gate on
@@ -148,27 +147,16 @@ namespace pwm{//methods for pwm
     dcore::tpwm=Interval/10;
   }
   void startN(uint32_t trev){
-    struct PWMNR{
-      int16_t npwm;
-      uint16_t tpwm;
-    } ts[sizeof(Tpwm)/sizeof(Tpwm[0])];
-
-    for(int i=0;i<sizeof(Tpwm)/sizeof(Tpwm[0]);i++){
-      ts[i].npwm=(int)(trev*100/Tpwm[i])%200-100;
-      ts[i].tpwm=Tpwm[i];
+    int tf=trev*130/400;
+    uint16_t *tbl=Tpwm;
+    if(tf>Tpwm[sizeof(Tpwm)/sizeof(Tpwm[0])-1]){
+      if(tf/2>Tpwm[0]) tbl++;
+    }
+    else{
+      while(tf>*tbl) tbl++;
     }
 
-    if(abs(ts[0].npwm)>50){
-      qsort(ts,sizeof(ts)/sizeof(ts[0]),sizeof(ts[0]),[](const void *ts1, const void * ts2){
-        int n1=abs(((PWMNR *)ts1)->npwm);
-        int n2=abs(((PWMNR *)ts2)->npwm);
-        if(n1>n2) return 1;
-        else if(n1<n2) return -1;
-        else return 0;
-      });
-    }
-
-    int tw=ts[0].tpwm;
+    int tw=*tbl;
     if(Count==0){
       Interval=tw;
       start();

@@ -57,7 +57,7 @@ void setup() {
   param::run(algor_param,sizeof(algor_param));
 
   ble::run(
-    "Shimano",  //device name 
+    "OpenDCb",  //device name 
     "10014246-f5b0-e881-09ab-42000ba24f83",  //service uuid
     "20024246-f5b0-e881-09ab-42000ba24f83",  //request uuid
     "20054246-f5b0-e881-09ab-42000ba24f83"   //notification uuid
