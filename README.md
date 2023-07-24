@@ -7,19 +7,19 @@ OpenDCb(rake) intends to open this technology as "Digital Casting brake", and be
 
 ## The Goals
 
-1. Firmware
-Arduino is the best entrance gate for a new commer of the embedded system. So we designed the software to run with Arduino. We selected [Seeeduino Xiao BLE](https://www.seeedstudio.com/Seeed-XIAO-BLE-nRF52840-p-5201.html) for the electric circuit shown later.
+1. Firmware for Arduino
+Arduino is the best entrance gate for a new comer of the embedded system. So we implemented the software to run with Arduino. We selected [Seeeduino Xiao BLE](https://www.seeedstudio.com/Seeed-XIAO-BLE-nRF52840-p-5201.html) for the electric circuit shown later.
 
-2. Realtime feedback (Line tension control)
-The realtime feedback is designed for the control algorism of this firmware. It directly controls the line tension with the quick change of the pwm duty. This results the brake intensity to adapt automatically to any lure and wind condition without the selection of such as rotary switches.
+2. Realtime direct line tension control  
+The realtime control is designed for the control of reel. It directly controls the line tension with the quick change of the pwm duty. This results the brake intensity to adapt automatically to any lure and wind condition without the selection of such as rotary switches.
 
-3. Circuit diagram
-The circuit is comprised with only discrete devices, no need of special devices as Hole-IC to detect spool revolution.
+3. Minimal Circuit  
+The circuit is comprised with only discrete devices, no need of the special devices such as a Hole-IC to detect spool rotation.
 
-4. Design rules of principal parts
+5. Design rules of principal parts  
 The principal parts are a coil and a magnet rotor. We reveal the design rule for these parts.
 
-5. Monitoring and Setting tools
+6. Monitoring and Setting tools  
 Due to the usage of casting reel, the wireless communication is needed for testing.
 
 ## Firmware
@@ -69,10 +69,11 @@ With the aid of battery(CR1632), the reel can be connected to Smart Phone via Bl
 - Shimano Cardif 50
 <img src="img/fig01.png" />
 <table>
-<tr><td colspan="2">Inside the cover of B-side<img src="img/fig10.png" />
+<tr><td colspan="2">Inside the cover of B-side<br><img src="img/fig10.png" />
 <tr><td>Back of the print circuit board<img src="img/fig11.png" />
 <td>Bearing holder and rotor<img src="img/fig12.png" />
 </table>
+
 ### The proof
 1. Lure adaptation
 
