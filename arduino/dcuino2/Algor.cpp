@@ -7,8 +7,8 @@
 
 //params
 uint8_t algor_param[]={
-  130,100,100,0,  20,50,0,0,
-  15,5,20,100,  0,0,0,0,
+  130,100,100,0,  20,70,20,0,
+  15,10,30,30,  2,15,125,0,
   20,17,40,30,  40,0,0,0,
   0,155,13,159, 27,145,45,101,
   79,69,128,39, 189,23,255,19,
@@ -77,15 +77,19 @@ static int readProf(int prof_tbl,int prof_tmsec,uint8_t &idx){
   idx=tbl_index;
   return hval;
 }
-static int smean(int wid){
+static int smean(int twid){
   logger::ALOG *dp=logger::data+logger::length()-1;
+  twid<<=10;  //to usec
+  int de=twid/dp->interval;
+  int tmin=dp->stamp-twid;
+  int ts=stime<<10;
+  if(tmin<ts) tmin=ts;
   long sum=0;
-  for(int dn=0;dn<wid;dp--,dn++){
+  int dn=0;
+  for(;dp->stamp>tmin;dp--,dn++){
     sum+=dp->sigma;
-    int tm=dp->stamp>>10;
-    if(tm<stime) break;
   }
-  return sum*2/wid;
+  return sum*2/MAX(dn,de);
 }
 void algor_prepare(){
   tusec=stime=ztime=sflag=iflag=zflag=0;
@@ -135,13 +139,13 @@ uint16_t algor_update(int32_t dtu,int32_t otu){
       stime=tmsec;
       sflag=PRM_ReadData10x(13)/(dt*1000);
       setTimeout.set(scall=[](){
-        sspec=smean(sflag);
+        sspec=smean(PRM_ReadData10x(13));
         if(dcore::RunLevel>=5 && logger::length()<logger::limit()) setTimeout.set(scall,PRM_ReadData10x(12));
         else sspec=0;
       },0);
     }
   }
-  auto sigb=sigw*100/PRM_ReadData(14);
+  auto sigb=sigw*1000/PRM_ReadData(14);
   logger::stage.sigma=MIN(255,MAX(0,sigb));
 //logger
   switch(PRM_ReadData(3)){
@@ -193,7 +197,8 @@ uint16_t algor_update(int32_t dtu,int32_t otu){
     case 4:{
       int zlim=zvalue*readTblN((40),wmax/100,4)/100;
       if(zlim>zlow){
-        int zfb=sspec*PRM_ReadData(20)/100;
+        auto kp=readTblN((20),(tmsec-stime)/10,2);
+        int zfb=sspec*kp/100;
         zvalue=zlim-zfb;
         if(zvalue<zlow) zvalue=zlow;
         if(sigv>0) zvalue=zlow;
