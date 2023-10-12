@@ -1,13 +1,13 @@
 <img src="img/logo.png" />
 
-# Open DC brake
+# "ArDCino" opens the digital control technology
 The most important element of baitcasting reel is the brake technology. This dominates the whole performance of baitcasting reel, that is "Long distance without Backlash".
-Digital control technology may be the most sophisticated solution for this problem. Shimano succeeded to realize it as [Digital Control Braking technology/DC brake](https://www.youtube.com/watch?v=iy6fYpK1zhY) in 2003, but no other manufacture has provided it yet. The drawback of DC brake is it is completely "untouchable" device, so no one can know about the inside of it.
-OpenDCb(rake) intends to open this technology as "Digital Casting brake", and be helpful for those who want to take this technolgy in their hands.
+Digital control technology may be the most sophisticated solution for this problem. Shimano succeeded to realize it as [Digital Control Braking technology/DC brake](https://www.youtube.com/watch?v=iy6fYpK1zhY) in 2003, but no other manufacture has provided it yet. The drawback of DC brake is it is completely "untouchable" device, so no one can know about the inside of it.  
+**ArDCino(=Arduino+DC)** intends to open this technology, and be helpful for those who want to take this technolgy in their hands.
 
 ## The Goals
 
-1. Firmware for Arduino
+1. Firmware for Arduino  
 Arduino is the best entrance gate for a new comer of the embedded system. So we implemented the software to run with Arduino. We selected [Seeeduino Xiao BLE](https://www.seeedstudio.com/Seeed-XIAO-BLE-nRF52840-p-5201.html) for the electric circuit shown later.
 
 2. Realtime direct line tension control  
