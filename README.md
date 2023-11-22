@@ -60,21 +60,3 @@ At line #149-
 ## Monitoring and Setting
 With the aid of battery(CR1632), the reel can be connected to Smart Phone via Bluetooth LE. An application to set parameters and to visualize the states of controller is available from [our Website](https://www.c-able.ne.jp/~hirai551/dl/dciot.html). Also the code of this web application are found under ["webapp"](webapp/) directory.
 <img src="img/fig03.png" />
-
-## Setting procedure
-1. Zero calibration
-
-## PoC
-### The prototype reel
-- Shimano Cardif 50
-<img src="img/fig01.png" />
-<table>
-<tr><td colspan="2">Inside the cover of B-side<br><img src="img/fig10.png" />
-<tr><td>Back of the print circuit board<img src="img/fig11.png" />
-<td>Bearing holder and rotor<img src="img/fig12.png" />
-</table>
-
-### The proof
-1. Lure adaptation
-
-2. Wind condition adaptation
