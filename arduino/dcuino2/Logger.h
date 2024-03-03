@@ -14,7 +14,7 @@ namespace logger{
     uint16_t latency;
     uint16_t omega;
     int16_t beta;
-    uint8_t sigma;
+    int16_t sigma;
   };
   extern ALOG stage;
   extern ALOG *data;

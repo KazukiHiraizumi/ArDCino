@@ -230,7 +230,7 @@ namespace sens{
     case 0:
       debouncer::start(Interval=dt,0);
 //      if(dt>20000 || dt>Interval){
-      if(dt>20000){
+      if(dt>15000){
         Nacc=0;
         break;
       }

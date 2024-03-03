@@ -27,6 +27,7 @@ namespace ble{
   static int16_t sweep_param=-1;
   static int16_t sweep_logger=-1;
   static long sweep_queue=0;
+  static uint8_t sweep_buf[10];
   static inline bool sweep_busy(){ return (int16_t)(sweep_logger&sweep_param)>=0;}
 //public:
   bool enb_connect=true;
@@ -34,19 +35,18 @@ namespace ble{
   uint8_t led_pin=LED_PWR;
   bool led_invert=false;
   void sweep_callback() {
-    uint8_t buf[10];
     if(sweep_param>=0){
       Serial.print("Sweep param ");
       Serial.println(sweep_param);
-      buf[0]=0xB0;
-      buf[1]=sweep_param;
+      sweep_buf[0]=0xB0;
+      sweep_buf[1]=sweep_param;
       int i=2;
-      for(;i<sizeof(buf);i++,sweep_param++){
+      for(;i<sizeof(sweep_buf);i++,sweep_param++){
         if(sweep_param>=param::length()) break;
-        buf[i]=param::data[sweep_param];
+        sweep_buf[i]=param::data[sweep_param];
       }
       if(i>2){
-        notifyCharacteristic.writeValue(buf,i);
+        notifyCharacteristic.writeValue(sweep_buf,i);
       }
       if(sweep_param<param::length()){
         sweep_queue=setTimeout.set(sweep_callback,20);
@@ -67,7 +67,7 @@ namespace ble{
         stens+=alog.beta;
       }
       if(i>0){
-        uint16_t *p=(uint16_t *)buf;
+        uint16_t *p=(uint16_t *)sweep_buf;
         p[0]=chendian(srev/i);
         p[1]=chendian(stm/i);
         p[2]=chendian(sdt/i);
@@ -76,7 +76,9 @@ namespace ble{
         p[4]=chendian(stens/i);
         Serial.print(srev/i);Serial.print(",");
         Serial.println(stens/i);
-        notifyCharacteristic.writeValue(buf,10);
+        setTimeout.set([]{
+          notifyCharacteristic.writeValue(sweep_buf,10);
+        },0);
       }
       if(sweep_logger<logger::length()){
         sweep_queue=setTimeout.set(sweep_callback,20);
@@ -146,7 +148,6 @@ namespace ble{
     }
   }
   void task_alive(){
-    delay(3000);//rtos::ThisThread::sleep_for(3000);
     if (!BLE.begin()) {
       Serial.println("Starting Bluetooth® Low Energy module failed!");
       return;
@@ -176,7 +177,9 @@ namespace ble{
     requestCharUuid=chr_req;
     notifyCharUuid=chr_not;
     flag_connect=false;
-    led_run();
-    thread_alive.start(mbed::callback(task_alive));
+    setTimeout.set([](){
+      led_run();
+      thread_alive.start(mbed::callback(task_alive));
+    },5000);
   }
 }
